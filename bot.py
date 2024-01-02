@@ -2757,9 +2757,10 @@ async def print_help(message, content="", compact_output=(OUTPUT_MODE == OutputM
 async def help_cmd(context, *, content=""):
 	await print_help(context.message, content)
 
+"""
 async def print_info(message, content=""):
 	import requests as req
-	from netifaces import interfaces, ifaddresses, AF_INET
+	# from netifaces import interfaces, ifaddresses, AF_INET
 	
 	async with message.channel.typing():
 		# get public IP address
@@ -2868,11 +2869,12 @@ async def print_info(message, content=""):
 	await message.channel.send(embed=embed)
 	
 	return
+"""
 
-@client.command(name='info', pass_context=True)
-async def info_cmd(context, *, content=""):
-	if await CommandPrecheck(context.message, whitelist=CONFIG['owner_user_ids']):
-		await print_info(context.message)
+# @client.command(name='info', pass_context=True)
+# async def info_cmd(context, *, content=""):
+# 	if await CommandPrecheck(context.message, whitelist=CONFIG['owner_user_ids']):
+# 		await print_info(context.message)
 	
 @client.command(name='test', pass_context=True)
 async def test(context, *, content=""):
@@ -2963,7 +2965,7 @@ dmCommands = {
 	'notifications': {'alias':['n'], 'cmd':toggle_notifications},
 	'set-repeat-timeout': {'alias':['timeout'], 'cmd':set_repeat_timeout},
 	'set-repeat-freq': {'alias':['freq'], 'cmd':set_repeat_freq},
-	'info': {'alias':[], 'cmd':print_info}
+	# 'info': {'alias':[], 'cmd':print_info}
 }
 
 client.run(CONFIG['bot_token'])
