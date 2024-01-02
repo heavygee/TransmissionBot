@@ -1,6 +1,6 @@
 {
     "DM_compact_output_user_ids": [],
-    "blacklist_user_ids": [],
+    "blacklist_user_ids": [0],
     "bot_prefix": "t/",
     "bot_token": "BOT-TOKEN",
     "delete_command_message_private_torrent": true,

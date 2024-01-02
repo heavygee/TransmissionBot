@@ -1,0 +1,6 @@
+aiohttp==3.8.6
+discord.py==2.3.2
+netifaces==0.11.0
+pytz==2023.3.post1
+Requests==2.31.0
+transmissionrpc==0.11

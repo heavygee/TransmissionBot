@@ -227,7 +227,12 @@ TORRENT_OPTOUT_USERS = {}
 async def determine_prefix(bot, message):
 	return CONFIG['bot_prefix']
 
-client = Bot(command_prefix=determine_prefix)
+# client = Bot(command_prefix=determine_prefix)
+
+intents = discord.Intents.all() 
+intents.members = False 
+client = commands.Bot(command_prefix=determine_prefix, intents=intents)
+
 TSCLIENT = None
 MAKE_CLIENT_FAILED = False
 
@@ -1120,7 +1125,12 @@ async def CommandPrecheck(message, whitelist=CONFIG['whitelist_user_ids']):
 		await asyncio.sleep(2)
 		await message.delete()
 		return False
-	if message.author.id in CONFIG['blacklist_user_ids'] or (len(whitelist) > 0 and message.author.id not in whitelist):
+	# if message.author.id in CONFIG['blacklist_user_ids'] or (len(whitelist) > 0 and message.author.id not in whitelist):
+	if message.author.id in CONFIG['blacklist_user_ids'] or (len(whitelist) > 0 and message.author.id in whitelist):
+		# print(message.author.id in CONFIG['blacklist_user_ids'])
+		# print(len(whitelist) > 0)
+		# print(message.author.id not in whitelist)
+		# print((len(whitelist) > 0 and message.author.id not in whitelist))
 		await message.channel.send("You're not allowed to use this...")
 		await asyncio.sleep(2)
 		await message.delete()
