@@ -8,16 +8,11 @@ Version: 1.2
 
 import discord
 import asyncio
-import aiohttp
-import json
 from json import dumps, load
-import subprocess
-from discord.ext.commands import Bot
 from discord.ext import commands
-from platform import python_version
 import os
 import sys
-from os.path import expanduser, join, exists, isdir, isfile
+from os.path import join, exists, isdir
 import shutil
 import re
 import datetime
@@ -26,14 +21,20 @@ import platform
 import secrets
 import transmissionrpc
 import logging
-from logging import handlers
 import base64
-import random
 from enum import Enum
+from time import sleep
+from pathlib import Path
 
 # BEGIN USER CONFIGURATION
 
-CONFIG_DIR = os.path.dirname(os.path.realpath(__file__))
+import os
+
+# Get the directory of the current file (bot.py)
+CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
+
+# Go up one level to the project root, then into the 'data' directory
+CONFIG_DIR = os.path.abspath(os.path.join(CURRENT_DIR, '..', 'data'))
 
 """
 Bot configuration is done with a config.json file.
@@ -41,11 +42,16 @@ Bot configuration is done with a config.json file.
 CONFIG = None
 TSCLIENT_CONFIG = None
 
-# logging.basicConfig(format='%(asctime)s %(message)s',filename=join(expanduser("~"),'ts_scripts.log'))
-logName = join(CONFIG_DIR,'transmissionbot.log')
-logging.basicConfig(format='%(asctime)s %(message)s',filename=join(CONFIG_DIR,'transmissionbot.log'))
+# Configure logging to use stdout
+logging.basicConfig(
+    format='%(asctime)s [%(threadName)14s:%(filename)8s:%(lineno)5s - %(funcName)20s()] %(levelname)8s: %(message)s',
+    level=logging.DEBUG,
+    handlers=[logging.StreamHandler(sys.stdout)]
+)
+
+# Get the logger
 logger = logging.getLogger('transmission_bot')
-logger.setLevel(logging.DEBUG) # set according to table below. Events with values LESS than the set value will not be logged
+
 """
 Level		Numeric value
 __________________________
@@ -57,12 +63,7 @@ DEBUG		10
 NOTSET		0
 """
 
-fh = logging.handlers.RotatingFileHandler(logName, backupCount=5)
-if os.path.isfile(logName):  # log already exists, roll over!
-	fh.doRollover()
-fmt = logging.Formatter('%(asctime)s [%(threadName)14s:%(filename)8s:%(lineno)5s - %(funcName)20s()] %(levelname)8s: %(message)s')
-fh.setFormatter(fmt)
-logger.addHandler(fh)
+# No need for file handlers or log rotation anymore
 
 
 # END USER CONFIGURATION
@@ -79,9 +80,6 @@ DEFAULT_REASON="TransmissionBot"
 
 def lock(lockfile=LOCK_FILE):
 	""" Wait for LOCK_FILE to not exist, then create it to lock """
-	from time import sleep
-	from random import random
-	from pathlib import Path
 	lock_file = Path(lockfile)
 		
 	logger.debug("Creating lock file '{}'".format(lockfile))
@@ -95,7 +93,6 @@ def lock(lockfile=LOCK_FILE):
 	
 def unlock(lockfile=LOCK_FILE):
 	""" Delete LOCK_FILE """
-	from pathlib import Path
 	lock_file = Path(lockfile)
 
 	logger.debug("Removing lock file '{}'".format(lockfile))
@@ -226,8 +223,6 @@ TORRENT_OPTOUT_USERS = {}
 
 async def determine_prefix(bot, message):
 	return CONFIG['bot_prefix']
-
-# client = Bot(command_prefix=determine_prefix)
 
 intents = discord.Intents.all() 
 intents.members = False 
