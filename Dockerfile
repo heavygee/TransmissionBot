@@ -1,9 +1,15 @@
-FROM python:3.10-alpine
+FROM python:3.10-slim
 
-COPY bot.py .
+WORKDIR /app
+
+# Copy the requirements file and install dependencies
 COPY requirements.txt .
-COPY config.json .
 
 RUN pip install --no-cache-dir -r requirements.txt
 
-CMD ["python", "-u", "bot.py"]
+# Copy the source and data directories
+COPY src/ src/
+COPY data/ data/
+
+# Run the bot
+CMD ["python", "-u", "src/bot.py"]

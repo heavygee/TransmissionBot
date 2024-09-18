@@ -30,11 +30,7 @@ from pathlib import Path
 
 import os
 
-# Get the directory of the current file (bot.py)
-CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
-
-# Go up one level to the project root, then into the 'data' directory
-CONFIG_DIR = os.path.abspath(os.path.join(CURRENT_DIR, '..', 'data'))
+CONFIG_DIR = '/data'
 
 """
 Bot configuration is done with a config.json file.
