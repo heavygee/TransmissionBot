@@ -106,7 +106,7 @@ def mkdir_p(path):
 	:return:
 	"""
 	try:
-		makedirs(path)
+		os.makedirs(path)
 	except OSError as exc:  # Python >2.5
 		if exc.errno == errno.EEXIST and isdir(path):
 			pass
@@ -115,40 +115,51 @@ def mkdir_p(path):
 
 def generate_json(json_data=None, path=None, overwrite=False):
 	"""Generate a new config file based on the value of the CONFIG global variable.
-
-	This function will cause a fatal error if trying to overwrite an exiting file
-	without setting overwrite to True.
-
+	This function will cause a fatal error if trying to overwrite an exiting file without setting overwrite to True.
 	:param overwrite: Overwrite existing config file
 	:type overwrite: bool
 	:return: Create status
 	:rtype: bool
 	"""
-	if not path or not json_data:
+	logger.debug(json_data)
+	logger.debug(path)
+ 
+	if not path or json_data is None:
 		return False
+
 	if exists(path) and not overwrite:
-		logger.fatal("JSON file exists already! (Set overwite option to overwrite)")
+		logger.fatal("JSON file exists already! (Set overwrite option to overwrite)")
 		return False
+
 	if not exists(os.path.dirname(path)):
 		mkdir_p(os.path.dirname(path))
+
 	try:
 		lock()
+		
 		if exists(path):
 			# first backup the existing file
-			shutil.copy2(path,"{}.bak".format(path))
-			try:
-				with open(path, 'w') as cf:
-					cf.write(dumps(json_data, sort_keys=True, indent=4, separators=(',', ': ')))
-			except Exception as e:
-				logger.error("Exception when writing JSON file {}, reverting to backup: {}".format(path,e))
-				shutil.move("{}.bak".format(path), path)
-		else:
+			shutil.copy2(path, f"{path}.bak")
+
+		if json_data:
+			# Write JSON data to file
 			with open(path, 'w') as cf:
-				cf.write(dumps(json_data, sort_keys=True, indent=4, separators=(',', ': ')))
+				cf.write(dumps(json_data, cf, sort_keys=True, indent=4, separators=(',', ': ')))
+		else:
+			# Remove the file if json_data is empty
+			if exists(path):
+				os.remove(path)
+			return True
+
 	except Exception as e:
-		logger.fatal("Exception when writing JSON file: {}".format(e))
+		logger.error(f"Exception when handling JSON file {path}: {e}")
+		if exists(f"{path}.bak"):
+			shutil.move(f"{path}.bak", path)
+		return False
+
 	finally:
 		unlock()
+
 	return True
 
 

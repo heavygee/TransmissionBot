@@ -14,4 +14,5 @@ services:
       - PYTHONUNBUFFERED=1
     volumes:
       - /volume1/docker/transmissionbot/data:/data
+      - /volume1/docker/transmissionbot/src:/src
     restart: unless-stopped
